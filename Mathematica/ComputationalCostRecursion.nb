@@ -1,0 +1,405 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 14.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     13283,        397]
+NotebookOptionsPosition[     10668,        344]
+NotebookOutlinePosition[     11064,        360]
+CellTagsIndexPosition[     11021,        357]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"ratioRecursion", "[", "n_", "]"}], ":=", " ", 
+    RowBox[{
+     RowBox[{"ratioRecursion", "[", "n", "]"}], "=", " ", 
+     RowBox[{
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{"n", ">", "0"}], ",", " ", 
+        RowBox[{
+         RowBox[{"ratioRecursion", "[", "0", "]"}], "-", 
+         RowBox[{
+          RowBox[{"1", "/", "2"}], "*", 
+          RowBox[{"Sum", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"ratioRecursion", "[", "m", "]"}], "^", "2"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"m", ",", "0", ",", 
+              RowBox[{"n", "-", "1"}]}], "}"}]}], "]"}]}]}], ",", "z"}], 
+       "]"}], "//", "Expand"}]}]}], ";"}], " "}]], "Input",
+ CellChangeTimes->{{3.957869684281693*^9, 3.957869706266244*^9}, {
+  3.957869776910643*^9, 3.957869850873456*^9}},
+ CellLabel->"In[1]:=",ExpressionUUID->"176ad7b5-b6a5-4d73-8a88-78f22d9cb414"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"ratioRecursion", "[", "1", "]"}], "/.", " ", 
+  RowBox[{"z", "->", " ", "2"}]}]], "Input",
+ CellChangeTimes->{{3.9578698559255953`*^9, 3.957869874623746*^9}},
+ CellLabel->"In[3]:=",ExpressionUUID->"72b4484d-0aeb-44bd-8b8d-c72b25f1af61"],
+
+Cell[BoxData["0"], "Output",
+ CellChangeTimes->{{3.957869858853918*^9, 3.957869875053151*^9}},
+ CellLabel->"Out[3]=",ExpressionUUID->"d14dabce-11e1-4ebf-9068-8d46ab06b2c9"]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{"ratioRecursion", "[", "3", "]"}]], "Input",
+ CellChangeTimes->{{3.957869877493722*^9, 3.957869879884172*^9}},
+ CellLabel->"In[4]:=",ExpressionUUID->"c6b34225-53aa-4b5d-9d6e-a22e0e841e0a"],
+
+Cell[BoxData[
+ RowBox[{"z", "-", 
+  FractionBox[
+   RowBox[{"3", " ", 
+    SuperscriptBox["z", "2"]}], "2"], "+", 
+  FractionBox[
+   RowBox[{"3", " ", 
+    SuperscriptBox["z", "3"]}], "2"], "-", 
+  FractionBox[
+   RowBox[{"9", " ", 
+    SuperscriptBox["z", "4"]}], "8"], "+", 
+  FractionBox[
+   RowBox[{"5", " ", 
+    SuperscriptBox["z", "5"]}], "8"], "-", 
+  FractionBox[
+   SuperscriptBox["z", "6"], "4"], "+", 
+  FractionBox[
+   SuperscriptBox["z", "7"], 
+   RowBox[{"1", "r6"}]], "-", 
+  FractionBox[
+   SuperscriptBox["z", "8"], "128"]}]], "Input",
+ CellChangeTimes->{{3.957871277603812*^9, 
+  3.9578712776090603`*^9}},ExpressionUUID->"ebbe3ae4-fb73-46d3-9878-\
+eb4bc4c14260"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"coeff3List", " ", "=", " ", 
+  RowBox[{"Table", "[", 
+   RowBox[{
+    RowBox[{"Coefficient", "[", 
+     RowBox[{
+      RowBox[{"ratioRecursion", "[", "n", "]"}], ",", " ", "z", ",", " ", 
+      "3"}], "]"}], ",", 
+    RowBox[{"{", 
+     RowBox[{"n", ",", "2", ",", "10"}], "}"}]}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.957869988490271*^9, 3.957870065702652*^9}, {
+  3.957870189117014*^9, 3.9578701967156677`*^9}},
+ CellLabel->"In[6]:=",ExpressionUUID->"da1411f6-4a84-426e-8671-9f12ae98724d"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   FractionBox["1", "2"], ",", 
+   FractionBox["3", "2"], ",", "3", ",", "5", ",", 
+   FractionBox["15", "2"], ",", 
+   FractionBox["21", "2"], ",", "14", ",", "18", ",", 
+   FractionBox["45", "2"]}], "}"}]], "Output",
+ CellChangeTimes->{3.957870066340885*^9, 3.9578701989502783`*^9},
+ CellLabel->"Out[6]=",ExpressionUUID->"09f3cb2b-4592-4d02-855e-6bcdd6d6beec"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"coeff3DiffList", " ", "=", " ", 
+  RowBox[{
+   RowBox[{"coeff3List", "[", 
+    RowBox[{"[", 
+     RowBox[{"2", ";;"}], "]"}], "]"}], "-", " ", 
+   RowBox[{"coeff3List", "[", 
+    RowBox[{"[", 
+     RowBox[{";;", 
+      RowBox[{"-", "2"}]}], "]"}], "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.957870208733276*^9, 3.9578702696106367`*^9}, {
+  3.957870393957767*^9, 3.957870396098238*^9}},
+ CellLabel->"In[12]:=",ExpressionUUID->"becb3c74-8157-496f-bc5d-41eba78e281d"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"1", ",", 
+   FractionBox["3", "2"], ",", "2", ",", 
+   FractionBox["5", "2"], ",", "3", ",", 
+   FractionBox["7", "2"], ",", "4", ",", 
+   FractionBox["9", "2"]}], "}"}]], "Output",
+ CellChangeTimes->{{3.957870240112853*^9, 3.957870270136071*^9}, 
+   3.957870396548267*^9},
+ CellLabel->"Out[12]=",ExpressionUUID->"a74281e8-fa29-4c69-b6aa-a92377d9ae0c"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"coeff4List", " ", "=", " ", 
+  RowBox[{"Table", "[", 
+   RowBox[{
+    RowBox[{"Coefficient", "[", 
+     RowBox[{
+      RowBox[{"ratioRecursion", "[", "n", "]"}], ",", " ", "z", ",", " ", 
+      "4"}], "]"}], ",", 
+    RowBox[{"{", 
+     RowBox[{"n", ",", "2", ",", "10"}], "}"}]}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.9578704251693087`*^9, 3.95787044016465*^9}},
+ CellLabel->"In[13]:=",ExpressionUUID->"aeaffa1f-0e39-41e2-89cc-10ed3ef3aeb8"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"-", 
+    FractionBox["1", "8"]}], ",", 
+   RowBox[{"-", 
+    FractionBox["9", "8"]}], ",", 
+   RowBox[{"-", 
+    FractionBox["15", "4"]}], ",", 
+   RowBox[{"-", 
+    FractionBox["35", "4"]}], ",", 
+   RowBox[{"-", 
+    FractionBox["135", "8"]}], ",", 
+   RowBox[{"-", 
+    FractionBox["231", "8"]}], ",", 
+   RowBox[{"-", 
+    FractionBox["91", "2"]}], ",", 
+   RowBox[{"-", 
+    FractionBox["135", "2"]}], ",", 
+   RowBox[{"-", 
+    FractionBox["765", "8"]}]}], "}"}]], "Output",
+ CellChangeTimes->{3.9578704412963552`*^9},
+ CellLabel->"Out[13]=",ExpressionUUID->"90f45c47-dd75-4fe8-aa9f-65068ec1577d"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"coeff4DiffList", " ", "=", " ", 
+  RowBox[{
+   RowBox[{"coeff4List", "[", 
+    RowBox[{"[", 
+     RowBox[{"2", ";;"}], "]"}], "]"}], "-", " ", 
+   RowBox[{"coeff4List", "[", 
+    RowBox[{"[", 
+     RowBox[{";;", 
+      RowBox[{"-", "2"}]}], "]"}], "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.957870451440048*^9, 3.9578704565456142`*^9}},
+ CellLabel->"In[14]:=",ExpressionUUID->"d7e3ca80-2dd1-4eac-b686-9ff79f199f84"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"-", "1"}], ",", 
+   RowBox[{"-", 
+    FractionBox["21", "8"]}], ",", 
+   RowBox[{"-", "5"}], ",", 
+   RowBox[{"-", 
+    FractionBox["65", "8"]}], ",", 
+   RowBox[{"-", "12"}], ",", 
+   RowBox[{"-", 
+    FractionBox["133", "8"]}], ",", 
+   RowBox[{"-", "22"}], ",", 
+   RowBox[{"-", 
+    FractionBox["225", "8"]}]}], "}"}]], "Output",
+ CellChangeTimes->{3.957870456942934*^9},
+ CellLabel->"Out[14]=",ExpressionUUID->"1191febe-4a50-4aba-a16f-b511f7f113a8"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"coeff3DiffDiffList", " ", "=", " ", 
+  RowBox[{
+   RowBox[{"coeff3DiffList", "[", 
+    RowBox[{"[", 
+     RowBox[{"2", ";;"}], "]"}], "]"}], "-", 
+   RowBox[{"coeff3DiffList", "[", 
+    RowBox[{"[", 
+     RowBox[{";;", 
+      RowBox[{"-", "2"}]}], "]"}], "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.957870476485865*^9, 3.957870495476075*^9}},
+ CellLabel->"In[15]:=",ExpressionUUID->"98466bf8-a943-4ad8-bcc8-0b2d49c94bad"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   FractionBox["1", "2"], ",", 
+   FractionBox["1", "2"], ",", 
+   FractionBox["1", "2"], ",", 
+   FractionBox["1", "2"], ",", 
+   FractionBox["1", "2"], ",", 
+   FractionBox["1", "2"], ",", 
+   FractionBox["1", "2"]}], "}"}]], "Output",
+ CellChangeTimes->{3.9578704962928343`*^9},
+ CellLabel->"Out[15]=",ExpressionUUID->"924f02aa-f681-4182-85ed-bd9c39886e80"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"coeff4DiffDiffList", " ", "=", " ", 
+  RowBox[{
+   RowBox[{"coeff4DiffList", "[", 
+    RowBox[{"[", 
+     RowBox[{"2", ";;"}], "]"}], "]"}], "-", 
+   RowBox[{"coeff4DiffList", "[", 
+    RowBox[{"[", 
+     RowBox[{";;", 
+      RowBox[{"-", "2"}]}], "]"}], "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.9578705084407787`*^9, 3.957870514366632*^9}},
+ CellLabel->"In[16]:=",ExpressionUUID->"54341450-bd79-4afc-a98e-7d35f2fa2fd2"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"-", 
+    FractionBox["13", "8"]}], ",", 
+   RowBox[{"-", 
+    FractionBox["19", "8"]}], ",", 
+   RowBox[{"-", 
+    FractionBox["25", "8"]}], ",", 
+   RowBox[{"-", 
+    FractionBox["31", "8"]}], ",", 
+   RowBox[{"-", 
+    FractionBox["37", "8"]}], ",", 
+   RowBox[{"-", 
+    FractionBox["43", "8"]}], ",", 
+   RowBox[{"-", 
+    FractionBox["49", "8"]}]}], "}"}]], "Output",
+ CellChangeTimes->{3.957870514773286*^9},
+ CellLabel->"Out[16]=",ExpressionUUID->"2d733ae4-7c9a-4409-92e5-83de59a9cbc3"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"coeff4DiffDiffDiffList", "=", 
+  RowBox[{
+   RowBox[{"coeff4DiffDiffList", "[", 
+    RowBox[{"[", 
+     RowBox[{"2", ";;"}], "]"}], "]"}], "-", 
+   RowBox[{"coeff4DiffDiffList", "[", 
+    RowBox[{"[", 
+     RowBox[{";;", 
+      RowBox[{"-", "2"}]}], "]"}], "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.957870601247175*^9, 3.9578706499710093`*^9}},
+ CellLabel->"In[18]:=",ExpressionUUID->"14582015-5d34-439f-87ca-2f2cf8a88b6e"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"-", 
+    FractionBox["3", "4"]}], ",", 
+   RowBox[{"-", 
+    FractionBox["3", "4"]}], ",", 
+   RowBox[{"-", 
+    FractionBox["3", "4"]}], ",", 
+   RowBox[{"-", 
+    FractionBox["3", "4"]}], ",", 
+   RowBox[{"-", 
+    FractionBox["3", "4"]}], ",", 
+   RowBox[{"-", 
+    FractionBox["3", "4"]}]}], "}"}]], "Output",
+ CellChangeTimes->{{3.9578706443471622`*^9, 3.957870650494318*^9}},
+ CellLabel->"Out[18]=",ExpressionUUID->"ad5e1378-6f4d-4115-9869-2cf3244a4061"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"ratioRecursion", "[", "3", "]"}], "/.", " ", 
+  RowBox[{"z", "->", "1"}]}]], "Input",
+ CellChangeTimes->{{3.9578712067539463`*^9, 3.95787122667778*^9}},
+ CellLabel->"In[20]:=",ExpressionUUID->"b8705fcf-b05e-46ed-bf88-a7ae0ad369ff"],
+
+Cell[BoxData[
+ FractionBox["39", "128"]], "Output",
+ CellChangeTimes->{{3.957871218389761*^9, 3.95787122705173*^9}},
+ CellLabel->"Out[20]=",ExpressionUUID->"8285955c-97f7-4105-9d0c-ad0d6aa6a766"]
+}, Open  ]],
+
+Cell["\<\
+It  look like the coefficient of z^2 is growing linearly, the coefficient of \
+z^3 is growing quadratically, and in general the coefficient of z^d is \
+growing as n^(d-1). \
+\>", "Text",
+ CellChangeTimes->{{3.957871309351899*^9, 
+  3.957871418567472*^9}},ExpressionUUID->"b5aeba33-b00e-47ea-91fe-\
+6e78462ad5c8"]
+},
+WindowSize->{2580, 1063.5},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"14.0 for Linux x86 (64-bit) (December 12, 2023)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"2d523ae5-19ff-492b-a5e1-8aaacacd9ab4"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 953, 25, 31, "Input",ExpressionUUID->"176ad7b5-b6a5-4d73-8a88-78f22d9cb414"],
+Cell[CellGroupData[{
+Cell[1536, 49, 271, 5, 29, "Input",ExpressionUUID->"72b4484d-0aeb-44bd-8b8d-c72b25f1af61"],
+Cell[1810, 56, 172, 2, 33, "Output",ExpressionUUID->"d14dabce-11e1-4ebf-9068-8d46ab06b2c9"]
+}, Open  ]],
+Cell[1997, 61, 211, 3, 29, "Input",ExpressionUUID->"c6b34225-53aa-4b5d-9d6e-a22e0e841e0a"],
+Cell[2211, 66, 681, 23, 54, "Input",ExpressionUUID->"ebbe3ae4-fb73-46d3-9878-eb4bc4c14260"],
+Cell[CellGroupData[{
+Cell[2917, 93, 519, 12, 31, "Input",ExpressionUUID->"da1411f6-4a84-426e-8671-9f12ae98724d"],
+Cell[3439, 107, 402, 9, 47, "Output",ExpressionUUID->"09f3cb2b-4592-4d02-855e-6bcdd6d6beec"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3878, 121, 488, 12, 29, "Input",ExpressionUUID->"becb3c74-8157-496f-bc5d-41eba78e281d"],
+Cell[4369, 135, 392, 9, 47, "Output",ExpressionUUID->"a74281e8-fa29-4c69-b6aa-a92377d9ae0c"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[4798, 149, 470, 11, 31, "Input",ExpressionUUID->"aeaffa1f-0e39-41e2-89cc-10ed3ef3aeb8"],
+Cell[5271, 162, 655, 22, 47, "Output",ExpressionUUID->"90f45c47-dd75-4fe8-aa9f-65068ec1577d"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5963, 189, 439, 11, 29, "Input",ExpressionUUID->"d7e3ca80-2dd1-4eac-b686-9ff79f199f84"],
+Cell[6405, 202, 506, 16, 47, "Output",ExpressionUUID->"1191febe-4a50-4aba-a16f-b511f7f113a8"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6948, 223, 444, 11, 29, "Input",ExpressionUUID->"98466bf8-a943-4ad8-bcc8-0b2d49c94bad"],
+Cell[7395, 236, 400, 11, 47, "Output",ExpressionUUID->"924f02aa-f681-4182-85ed-bd9c39886e80"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7832, 252, 446, 11, 29, "Input",ExpressionUUID->"54341450-bd79-4afc-a98e-7d35f2fa2fd2"],
+Cell[8281, 265, 545, 18, 47, "Output",ExpressionUUID->"2d733ae4-7c9a-4409-92e5-83de59a9cbc3"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[8863, 288, 448, 11, 29, "Input",ExpressionUUID->"14582015-5d34-439f-87ca-2f2cf8a88b6e"],
+Cell[9314, 301, 512, 16, 47, "Output",ExpressionUUID->"ad5e1378-6f4d-4115-9869-2cf3244a4061"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[9863, 322, 266, 5, 29, "Input",ExpressionUUID->"b8705fcf-b05e-46ed-bf88-a7ae0ad369ff"],
+Cell[10132, 329, 195, 3, 47, "Output",ExpressionUUID->"8285955c-97f7-4105-9d0c-ad0d6aa6a766"]
+}, Open  ]],
+Cell[10342, 335, 322, 7, 35, "Text",ExpressionUUID->"b5aeba33-b00e-47ea-91fe-6e78462ad5c8"]
+}
+]
+*)
+
