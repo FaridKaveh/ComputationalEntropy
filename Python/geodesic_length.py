@@ -9,16 +9,17 @@ The metric tensor component is:
 The geodesic length from a to b is:
     L = integral_a^b sqrt(g_11(x)) dx
 """
-import mpmath as mp
+import mpmath
 import numpy as np
+from log_partition import mth_cumulant
 
 
 def set_precision(decimal_places: int = 50) -> None:
     """Set the numerical precision for mpmath calculations."""
-    mp.mp.dps = decimal_places
+    mpmath.mp.dps = decimal_places
 
 
-def metric_component(x: mp.mpf, n: int) -> mp.mpf:
+def metric_component(x: mpmath.mpf, n: int) -> mpmath.mpf:
     """
     Evaluate the metric tensor component g_11(x).
 
@@ -43,25 +44,25 @@ def metric_component(x: mp.mpf, n: int) -> mp.mpf:
 
     For small |x|, we use this limiting value to avoid catastrophic cancellation.
     """
-    x = mp.mpf(x)
+    x = mpmath.mpf(x)
 
     # For very small |x|, use the limiting value to avoid numerical issues
     # The limit as x -> 0 is (n^2 - 1) / 12
-    if mp.fabs(x) < mp.mpf("1e-12"):
-        return mp.mpf(n**2 - 1) / 12
+    if mpmath.fabs(x) < mpmath.mpf("1e-12"):
+        return mpmath.mpf(n**2 - 1) / 12
 
     # First term: e^x / (e^x - 1)^2
-    exp_x = mp.exp(x)
+    exp_x = mpmath.exp(x)
     term1 = exp_x / (exp_x - 1) ** 2
 
     # Second term: n^2 * e^(nx) / (e^(nx) - 1)^2
-    exp_nx = mp.exp(n * x)
+    exp_nx = mpmath.exp(n * x)
     term2 = (n**2) * exp_nx / (exp_nx - 1) ** 2
 
     return term1 - term2
 
 
-def integrand(x: mp.mpf, n: int) -> mp.mpf:
+def integrand(x: mpmath.mpf, n: int) -> mpmath.mpf:
     """
     Evaluate the integrand sqrt(g_11(x)) for the geodesic length.
 
@@ -90,10 +91,10 @@ def integrand(x: mp.mpf, n: int) -> mp.mpf:
             "The metric is not positive definite at this point."
         )
 
-    return mp.sqrt(g)
+    return mpmath.sqrt(g)
 
 
-def energy_integrand(x: mp.mpf, n: int) -> mp.mpf:
+def energy_integrand(x: mpmath.mpf, n: int) -> mpmath.mpf:
     """
     Evaluate the integrand sqrt(g_11(x)) for the path energy.
 
@@ -133,7 +134,8 @@ def geodesic_length(
     decimal_places: int = 50,
     maxdegree=6,
     verbose: bool = False,
-) -> mp.mpf:
+    error: bool = False,
+) -> mpmath.mpf:
     """
     Compute the geodesic length from x = a to x = b.
 
@@ -157,8 +159,8 @@ def geodesic_length(
     """
     set_precision(decimal_places)
 
-    a_mp = mp.mpf(a)
-    b_mp = mp.mpf(b)
+    a_mp = mpmath.mpf(a)
+    b_mp = mpmath.mpf(b)
 
     if verbose:
         print(f"Computing geodesic length from x = {a} to x = {b}")
@@ -168,10 +170,10 @@ def geodesic_length(
 
         # Note about x = 0
         if a < 0 < b:
-            limit_val = mp.mpf(n**2 - 1) / 12
+            limit_val = mpmath.mpf(n**2 - 1) / 12
             print(f"NOTE: The interval contains x = 0 (removable singularity).")
             print(
-                f"      Limit as x → 0: g_11(0) = (n² - 1)/12 = {mp.nstr(limit_val, 10)}"
+                f"      Limit as x → 0: g_11(0) = (n² - 1)/12 = {mpmath.nstr(limit_val, 10)}"
             )
             print()
 
@@ -180,8 +182,8 @@ def geodesic_length(
         sample_points = [a, 0, b] if a < 0 < b else [a, (a + b) / 2, b]
         sample_points = [p for p in sample_points if a <= p <= b]
         for pt in sample_points:
-            g_val = metric_component(mp.mpf(pt), n)
-            if mp.isinf(g_val):
+            g_val = metric_component(mpmath.mpf(pt), n)
+            if mpmath.isinf(g_val):
                 status = "∞ (singularity)"
             elif g_val > 0:
                 status = "(POSITIVE)"
@@ -189,7 +191,7 @@ def geodesic_length(
                 status = "= 0 (degenerate)"
             else:
                 status = "Warning (NEGATIVE)"
-            print(f"  g_11({pt}) = {mp.nstr(g_val, 10)} {status}")
+            print(f"  g_11({pt}) = {mpmath.nstr(g_val, 10)} {status}")
         print()
 
     # Define the integrand as a function of x only
@@ -202,15 +204,21 @@ def geodesic_length(
     if verbose:
         print("Performing numerical integration...")
 
-    length = mp.quad(f, [a_mp, b_mp], maxdegree=maxdegree)
+    if error:
+        length, error = mpmath.quad(f, [a_mp, b_mp], maxdegree=maxdegree, error=error)
+    else:
+        length = mpmath.quad(f, [a_mp, b_mp], maxdegree=maxdegree)
 
     if verbose:
         print(f"\nGeodesic length L = {length}")
         print(
-            f"\nTo {min(15, decimal_places)} significant figures: {mp.nstr(length, min(15, decimal_places))}"
+            f"\nTo {min(15, decimal_places)} significant figures: {mpmath.nstr(length, min(15, decimal_places))}"
         )
 
-    return length
+    if error:
+        return length, error
+    else:
+        return length
 
 
 def path_energy(
@@ -218,14 +226,14 @@ def path_energy(
     b: float,
     n: int,
     decimal_places: int = 50,
-) -> mp.mpf:
-    a_mp = mp.mpf(a)
-    b_mp = mp.mpf(b)
+) -> mpmath.mpf:
+    a_mp = mpmath.mpf(a)
+    b_mp = mpmath.mpf(b)
 
     def f(x):
         return integrand(x, n)
 
-    energy = mp.quad(f, [a_mp, b_mp])
+    energy = mpmath.quad(f, [a_mp, b_mp])
 
     return energy
 
@@ -257,7 +265,7 @@ def analyse_metric_positivity(
     set_precision(decimal_places)
 
     points = [
-        mp.mpf(a) + (mp.mpf(b) - mp.mpf(a)) * i / (num_points - 1)
+        mpmath.mpf(a) + (mpmath.mpf(b) - mpmath.mpf(a)) * i / (num_points - 1)
         for i in range(num_points)
     ]
 
@@ -279,42 +287,3 @@ def analyse_metric_positivity(
         "negative_points": negative_points[:10],  # First 10 if any
         "num_negative": len(negative_points),
     }
-
-
-if __name__ == "__main__":
-    # Example usage
-    print("=" * 60)
-    print("Geodesic Length Calculator")
-    print("=" * 60)
-    print()
-
-    # Parameters
-    # n = 10  # Natural number parameter
-    a = -3  # Start point
-    b = 3  # End point
-    precision = 300  # Decimal places
-
-    # First, analyse metric positivity
-    # print("Analysing metric positivity on the interval...")
-    # analysis = analyse_metric_positivity(a, b, n, num_points=200, decimal_places=30)
-    # print(f"  Minimum value of g_11: {mp.nstr(analysis['minimum_value'], 10)}")
-    # print(f"  Location of minimum: {mp.nstr(analysis['minimum_location'], 6)}")
-    # print(f"  Metric is positive definite: {analysis['is_positive_definite']}")
-
-    # if not analysis["is_positive_definite"]:
-    #     print(f"  WARNING: Found {analysis['num_negative']} negative sample points")
-    #     print("  The integral may not be well-defined as a Riemannian length.")
-    # print()
-
-    # Compute geodesic length
-    print("-" * 60)
-
-    energies = np.zeros(195)
-    for n in range(5, 200):
-        try:
-            L = path_energy(a, b, n, decimal_places=precision)
-            energies[n - 5] = L
-        except ValueError as e:
-            print(f"Error: {e}")
-
-    np.save("optimisation_data/energies", energies)

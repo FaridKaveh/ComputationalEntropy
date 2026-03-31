@@ -1,10 +1,10 @@
-from numpy.dtypes import ObjectDType
-from scipy.optimize import minimize
 import numpy as np
 from mpmath import *
+from numpy.dtypes import ObjectDType
+from scipy.optimize import minimize
 
 
-def phi(x, n):
+def phi(x: float, n: int) -> float:
     if x == 1:
         return (n - 1) / 2
     else:
@@ -14,16 +14,20 @@ def phi(x, n):
         return nom / denom
 
 
-def varphi(x, n, r0):
-    return phi(r0 * mp.exp(-x), n)
+def psi(x: float, n: int, delta: float) -> float:
+    c_delta = -mp.log(delta)
+    return phi(mp.exp(c_delta * (1 - 2 * x)), n)
+
+
+def varphi(x, n, delta):
+    return phi(1 / delta * mp.exp(-x), n)
 
 
 def cost_fun(x, n, m, r0):
     phi_arr = np.zeros(m)
 
     for i in range(m):
-        # phi_arr[i] = phi(r0 * mp.exp(-np.sum(x[:i])), n)
-        phi_arr[i] = varphi(np.sum(x[:i]), n, r0)
+        phi_arr[i] = varphi(np.sum(x[:i]), n, delta)
 
     cost = np.sum(x * phi_arr)
 
@@ -48,14 +52,14 @@ def get_prob_vectors(n, state_seq):
 
 
 if __name__ == "__main__":
-    mp.dps = 50
+    mp.dps = 600
     # delta \approx 0.05
-    delta = np.exp(-3)
-    c_delta = -np.log(delta)
+    delta = mp.exp(-3)
+    c_delta = -mp.log(delta)
     # starting bias
     r0 = 1 / delta
 
-    n = 10
+    n = 20
     m_min = 5
     m_max = 100
     step = 5
@@ -63,12 +67,12 @@ if __name__ == "__main__":
     protocols = []
     cost_arr = np.zeros(m_max // step)
 
-    cons = {"type": "eq", "fun": lambda x: np.sum(x) + 2 * np.log(delta)}
+    cons = {"type": "eq", "fun": lambda x: np.sum(x) + 2 * mp.log(delta)}
 
     x0_guesses = ["constant"]
 
     for initial_partition in x0_guesses:
-        for m in range(m_min, m_max, step):
+        for m in range(m_min, m_max + 1, step):
             if initial_partition == "decreasing":
                 x0 = [(1 / 2) ** i for i in range(1, m)]
                 x0.append(1 - sum(x0))
@@ -88,20 +92,28 @@ if __name__ == "__main__":
             my_args = (n, m, r0)
             fun = lambda x: cost_fun(x, *my_args)
 
-            print(x0)
             # print(f"n={my_args[0]}, m={my_args[1]}, r0={my_args[2]}, cost={fun(x0)}")
 
-            res = minimize(fun, x0, method="SLSQP", jac="3-point", constraints=cons)
+            res = minimize(
+                fun,
+                x0,
+                method="SLSQP",
+                jac="3-point",
+                constraints=cons,
+                tol=1e-9,
+                options={"disp": True, "maxiter": 300},
+            )
             print(res.x)
             protocols.append(res.x)
             cost_arr[(m - m_min) // step] = fun(res.x)
+            print(f"cost({m})={fun(res.x)}")
 
-        # np.save(
-        #     f"/home/farid/Documents/NonGitCode/ComputationalEntropy/optimalProtocolCost_{n}_{m_min}_{m_max}_{step}_{initial_partition}",
-        #     cost_arr,
-        # )
-        # protocols_tosave = np.array(protocols, dtype=ObjectDType)
-        # np.save(
-        #     f"/home/farid/Documents/NonGitCode/ComputationalEntropy/optimalProtocol_{n}_{m_min}_{m_max}_{step}_{initial_partition}",
-        #     protocols_tosave,
-        # )
+        np.save(
+            f"/home/farid/Documents/git/ComputationalEntropy/optimisation_data/optimalProtocolCost_n{n}_deltaE{mp.log(delta)}_m_min{m_min}_m_max{m_max}_step{step}",
+            cost_arr,
+        )
+        protocols_tosave = np.array(protocols, dtype=ObjectDType)
+        np.save(
+            f"/home/farid/Documents/git/ComputationalEntropy/optimisation_data/optimalProtocol_n{n}_deltaE{mp.log(delta)}_m_min{m_min}_m_max{m_max}_step{step}",
+            protocols_tosave,
+        )
