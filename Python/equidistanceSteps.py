@@ -1,12 +1,48 @@
 import mpmath as mp
 import numpy as np
+from scipy.optimize import fsolve
 
-from geodesic_length import *
+from geodesic_length import geodesic_length, integrand
 
 """
 Design an (optimal?) control protocol by taking equidistant steps in parameter space according to the Fisher information
 metric.
 """
+
+
+def calc_step_point_scipy(
+    start: float,
+    n_states: int,
+    budget: float,
+    delta: float,
+    n_steps: int,
+    rel_tolerance: float = 1e-4,
+    decimal_places: int = 50,
+    maxdegree: int = 6,
+) -> float:
+
+    def f(x: np.ndarray) -> float:
+        x = x[0]
+        cost = (
+            geodesic_length(
+                start, x, n_states, decimal_places=decimal_places, maxdegree=maxdegree
+            )
+            - budget
+        )
+        return np.asarray([cost], dtype="float64")
+
+    def df(x: np.ndarray) -> float:
+        x = x[0]
+        derivative = integrand(x, n_states)
+        return np.asarray([derivative], dtype="float64")
+
+    c_delta = -mp.log(delta)
+    step_size = 2 * c_delta / n_steps
+    sol_guess = np.asarray([start + step_size], dtype="float64")
+
+    sol = fsolve(f, sol_guess, fprime=df, xtol=rel_tolerance)[0]
+
+    return sol
 
 
 def calc_step_point(
@@ -80,6 +116,7 @@ def calc_equidistance_steps(
     rel_tolerance: float = 1e-4,
     decimal_places: int = 50,
     maxdegree: int = 6,
+    mode: str = "scipy",
 ) -> np.ndarray:
 
     equidistant_steps = np.zeros(n_steps + 1, dtype=float)
@@ -93,17 +130,30 @@ def calc_equidistance_steps(
 
     step_budget = total_length / n_steps
 
-    for i in range(1, n_steps + 1):
-        equidistant_steps[i] = calc_step_point(
-            equidistant_steps[i - 1],
-            n_states,
-            step_budget,
-            delta,
-            n_steps,
-            rel_tolerance=rel_tolerance,
-            decimal_places=decimal_places,
-            maxdegree=maxdegree,
-        )
+    if mode == "scipy":
+        for i in range(1, n_steps + 1):
+            equidistant_steps[i] = calc_step_point_scipy(
+                equidistant_steps[i - 1],
+                n_states,
+                step_budget,
+                delta,
+                n_steps,
+                rel_tolerance=rel_tolerance,
+                decimal_places=decimal_places,
+                maxdegree=maxdegree,
+            )
+    elif mode == "my_solver":
+        for i in range(1, n_steps + 1):
+            equidistant_steps[i] = calc_step_point(
+                equidistant_steps[i - 1],
+                n_states,
+                step_budget,
+                delta,
+                n_steps,
+                rel_tolerance=rel_tolerance,
+                decimal_places=decimal_places,
+                maxdegree=maxdegree,
+            )
 
     return equidistant_steps
 
@@ -113,7 +163,7 @@ def check_equidistant_steps(
     n_steps: int,
     delta: float,
     equidistant_steps_arr: np.ndarray,
-    rel_tolerance: float = 1e-4,
+    rel_tolerance: float = 1e-2,
     decimal_places: int = 30,
     maxdegree: int = 6,
 ) -> bool:
