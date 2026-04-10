@@ -1,9 +1,8 @@
 import numpy as np
+from equidistanceSteps import calc_equidistance_steps, check_equidistant_steps
 from mpmath import *
 from numpy.dtypes import ObjectDType
 from scipy.optimize import minimize
-
-from equidistanceSteps import calc_equidistance_steps, check_equidistant_steps
 
 
 def phi(x: float, n: int) -> float:
@@ -81,7 +80,7 @@ def make_fim_heuristic_partition(
 
     if not convergence:
         print("make_fim_heuristic_partition: Failed to produce equidistant partion.")
-        return None
+        raise RuntimeError
     else:
         equidistant_partition = np.asarray(
             [
@@ -102,8 +101,8 @@ if __name__ == "__main__":
     r0 = 1 / delta
 
     n = 200
-    m_min = 5
-    m_max = 100
+    m_min = 105
+    m_max = 200
     step = 5
 
     protocols = []
@@ -126,10 +125,11 @@ if __name__ == "__main__":
                 x0 = np.asarray(x0) * (2 * c_delta)
 
             elif initial_partition == "constant":
-                x0 = make_fim_heuristic_partition(
-                    n, m, delta, decimal_points=mp.dps, maxdegree=maxdegree
-                )
-                if x0 is None:
+                try:
+                    x0 = make_fim_heuristic_partition(
+                        n, m, delta, decimal_points=mp.dps, maxdegree=maxdegree
+                    )
+                except RuntimeError:
                     x0 = np.full(m, 2 * c_delta / m)
 
             else:
@@ -155,11 +155,11 @@ if __name__ == "__main__":
             print(f"cost({m})={fun(res.x)}")
 
         np.save(
-            f"/home/farid/Documents/git/ComputationalEntropy/optimisation_data/optimalProtocolCost_fimHeuristic_n{n}_deltaE{mp.log(delta)}_m_min{m_min}_m_max{m_max}_step{step}",
+            f"/home/farid/Documents/git/ComputationalEntropy/optimisation_data/optimalProtocolCost_fimHeuristic_n{n}_deltaE{np.log(delta)}_m_min{m_min}_m_max{m_max}_step{step}",
             cost_arr,
         )
         protocols_tosave = np.array(protocols, dtype=ObjectDType)
         np.save(
-            f"/home/farid/Documents/git/ComputationalEntropy/optimisation_data/optimalProtocol_fimHeuristic_n{n}_deltaE{mp.log(delta)}_m_min{m_min}_m_max{m_max}_step{step}",
+            f"/home/farid/Documents/git/ComputationalEntropy/optimisation_data/optimalProtocol_fimHeuristic_n{n}_deltaE{np.log(delta)}_m_min{m_min}_m_max{m_max}_step{step}",
             protocols_tosave,
         )

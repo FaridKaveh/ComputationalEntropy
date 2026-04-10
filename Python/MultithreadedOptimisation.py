@@ -1,9 +1,11 @@
+from functools import partial
 from multiprocessing import Pool
-import numpy as np
-from scipy.optimize import minimize
-from mpmath import *
-from EnergyProtocolOptimization import *
 from typing import Any
+
+import numpy as np
+from EnergyProtocolOptimization import *
+from mpmath import *
+from scipy.optimize import minimize
 
 
 def optimise_partition(n: int, m: int, delta: float) -> tuple[int, int, np.ndarray]:
@@ -28,7 +30,7 @@ def optimise_partition(n: int, m: int, delta: float) -> tuple[int, int, np.ndarr
     """
     m, n = int(m), int(n)
     r0 = 1 / delta
-    c_delta = -np.log(delta)
+    c_delta = -np.log(float(delta))
 
     x0 = np.full(m, 2 * c_delta / m)
 
@@ -70,7 +72,7 @@ def optimise_partition_random_start(x0: np.ndarray) -> list[tuple]:
     n, m = 10, x0.shape[0]
 
     delta = np.exp(-3)
-    c_delta = -np.log(delta)
+    c_delta = -np.log(float(delta))
     r0 = 1 / delta
 
     my_args = (n, m, r0)
@@ -161,20 +163,66 @@ def make_pool(
     return optimal_protocols
 
 
+def get_optimal_partition(
+    n: int, m: int, delta: float, decimal_points: int = 50, maxdegree: int = 10
+) -> tuple[int, bool, float, np.ndarray]:
+    """
+    Tuple of returns is (number of steps, optimisation success, value of const_fun, optimal partition)
+    """
+    my_args = (n, m, delta)
+
+    def _fun(x):
+        return cost_fun(x, *my_args)
+
+    # heuristic x0 to initialise the optimisation
+    try:
+        x0 = make_fim_heuristic_partition(
+            n, m, delta, decimal_points=decimal_points, maxdegree=maxdegree
+        )
+    except RuntimeError:
+        x0 = np.full(m, 2 * c_delta / m)
+
+    cons = {"type": "eq", "fun": lambda x: np.sum(x) + 2 * np.log(float(delta))}
+    res = minimize(
+        _fun,
+        x0,
+        method="SLSQP",
+        jac="3-point",
+        constraints=cons,
+        tol=1e-9,
+        options={"disp": True, "maxiter": 1000},
+    )
+
+    return (m, res.success, res.fun, res.x)
+
+
+def make_pool_v2(
+    n_threads: int, n_states: int, m_min: int, m_max: int, delta: float, **kwargs
+):
+
+    _fun = partial(get_optimal_partition, n_states, delta=delta, **kwargs)
+    protocol_lengths = [_i for _i in range(m_min, m_max + 1, 5)]
+    with Pool(n_threads) as p:
+        opt_results = p.map(_fun, protocol_lengths)
+
+    return opt_results
+
+
 if __name__ == "__main__":
     # we need high precision because we have terms like (1-epsilon)^n for n moderately large.
     mp.dps = 70
 
     n_threads = 4
-    m_max = 80
-    n_max = 20
+    n = 20
+    m_min = 5
+    m_max = 100
     delta = np.exp(-3)
 
-    optimal_protocols = make_pool(
-        n_max,
-        m_max,
-        delta,
-        n_threads,
+    res = make_pool_v2(
+        n_threads, n, m_min, m_max, delta, decimal_points=50, maxdegree=11
     )
+
+    print(res[:5])
+    print(res[-5:])
 
     # print(optimal_protocols)

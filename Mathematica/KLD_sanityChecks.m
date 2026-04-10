@@ -42,40 +42,11 @@
 
 
 (* ::Input:: *)
-(*Limit[\[Phi][10,x],x->0]*)
+(*\[Psi][c_, n_, x_]:= \[Phi][n, Exp[-c*x]];*)
 
 
 (* ::Input:: *)
-(**)
-(*RecurrenceTable[{a[m+1]==a[m]*Exp[1/N[\[Phi][10,a[m]]]], a[1]==1/\[Delta]}, a,{m,1,10}]*)
-
-
-(* ::Input:: *)
-(*N[Exp[1/\[Phi][10,1/\[Delta]]]]*)
-
-
-(* ::Input:: *)
-(*Series[\[Phi][10,x]^(-1), x->0]*)
-
-
-(* ::Input:: *)
-(*\[Phi][n_,x_]:= (x-n*x^n+(n-1)x^(n+1))/((1-x)(1-x^n))*)
-
-
-(* ::Input:: *)
-(*N[\[Phi][10, 3]]*)
-
-
-(* ::Input:: *)
-(*Series[\[Phi][n,x], {x,0,2}] *)
-
-
-(* ::Input:: *)
-(*f[c_, n_, x_]:= \[Phi][n, Exp[-c*x]];*)
-
-
-(* ::Input:: *)
-(*Plot[{f[-3,10,x],f[-3,5,x],f[-3,7,x] },{x,-3,3}, PlotStyle->{Red, Blue, Green}]*)
+(*Plot[{\[Psi][-3,10,x],\[Psi][-6,10,x],\[Psi][-9,10,x] },{x,-1,1}, PlotStyle->{Red, Blue, Green}]*)
 
 
 (* ::Input:: *)

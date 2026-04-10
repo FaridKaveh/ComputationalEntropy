@@ -1,3 +1,5 @@
+import math
+
 import mpmath as mp
 import numpy as np
 from scipy.optimize import fsolve
@@ -14,29 +16,31 @@ def calc_step_point_scipy(
     start: float,
     n_states: int,
     budget: float,
-    delta: float,
+    c_delta: float,
     n_steps: int,
     rel_tolerance: float = 1e-4,
     decimal_places: int = 50,
     maxdegree: int = 6,
 ) -> float:
 
-    def f(x: np.ndarray) -> float:
-        x = x[0]
+    def f(x: np.ndarray) -> np.ndarray:
+
         cost = (
             geodesic_length(
-                start, x, n_states, decimal_places=decimal_places, maxdegree=maxdegree
+                start,
+                x[0],
+                n_states,
+                decimal_places=decimal_places,
+                maxdegree=maxdegree,
             )
             - budget
         )
         return np.asarray([cost], dtype="float64")
 
-    def df(x: np.ndarray) -> float:
-        x = x[0]
-        derivative = integrand(x, n_states)
+    def df(x: np.ndarray) -> np.ndarray:
+        derivative = integrand(x[0], n_states)
         return np.asarray([derivative], dtype="float64")
 
-    c_delta = -mp.log(delta)
     step_size = 2 * c_delta / n_steps
     sol_guess = np.asarray([start + step_size], dtype="float64")
 
@@ -121,7 +125,7 @@ def calc_equidistance_steps(
 
     equidistant_steps = np.zeros(n_steps + 1, dtype=float)
 
-    c_delta = -mp.log(delta)
+    c_delta = -math.log(delta)
     equidistant_steps[0] = -c_delta
 
     total_length = geodesic_length(
@@ -136,7 +140,7 @@ def calc_equidistance_steps(
                 equidistant_steps[i - 1],
                 n_states,
                 step_budget,
-                delta,
+                c_delta,
                 n_steps,
                 rel_tolerance=rel_tolerance,
                 decimal_places=decimal_places,
